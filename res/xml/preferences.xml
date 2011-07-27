@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General">
+    	<EditTextPreference android:key="SiteUrl" android:title="Site Url" android:summary="The site to upload data" android:defaultValue="http://rcbu.appspot.com" />
+    </PreferenceCategory>
+</PreferenceScreen>
