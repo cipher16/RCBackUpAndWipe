@@ -37,24 +37,38 @@ import com.google.gson.Gson;
 
 public class C2DMReceiver extends C2DMBaseReceiver {
 	
-	enum action {STATUS,WIPE,GEOLOC,RING}
-	
+	/**
+	 * Status, send all known & usefull? data
+	 * Wipe, wipe phone
+	 * Geoloc, send geoloc data
+	 * Ring, make the phone ring
+	 * Auth, after C2DM registration, send regId with mail to the webapplication (to get the link between mail and phone)
+	 * @author kikoolol
+	 *
+	 */
+	private enum action {STATUS,WIPE,GEOLOC,RING,AUTH}
+	private static String registrationID;
 	public C2DMReceiver() {
 		super("dummy@google.com");
 	}
-
+	
 	@Override
 	public void onRegistered(Context context, String registrationId)
 			throws java.io.IOException {
 		Log.e("C2DM", "Registration ID arrived: Fantastic!!!");
 		Log.e("C2DM", registrationId);
+		registrationID = registrationId;
+		
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		pref.edit().putString("RegistrationID", registrationID).commit();
+		launchAction("AUTH");//to send link between phone and mail account
 	};
 
 	@Override
 	protected void onMessage(Context context, Intent intent) {
 		Log.e("C2DM", "Got the message : "+intent.getStringExtra("message"));
 		String action = intent.getStringExtra("message");
-		if(action.matches("(wipe|geoloc|status|ring)"))
+		if(action.matches("(wipe|geoloc|status|ring)"))//don't need to send auth again
 			launchAction(action.toUpperCase());
 	}
 
@@ -63,6 +77,14 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	
 	public void launchAction(String a)
 	{
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		String mail= pref.getString("MailAccount", "gotNothing");
+		
+		DataTransfer dt = new DataTransfer();
+		dt.setType(a);
+		dt.setId(registrationID);
+		dt.setMail(mail);
+		
 		HashMap<String, String> data = new HashMap<String, String>();
 		
 		switch (action.valueOf(a)) {
@@ -122,13 +144,14 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 				}
 			break;
 		}
-		sendData(generateJson(data));
+		dt.setData(data);
+		sendData(generateJson(dt));
 	}
 	
-	public String generateJson(HashMap<String, String> d)
+	public String generateJson(DataTransfer dt)
 	{
 		Gson gson = new Gson();
-		String json = gson.toJson(d);
+		String json = gson.toJson(dt);
 		Log.e("C2DM", "JSON : "+json);
 		return 	json;
 	}
@@ -136,9 +159,9 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	public void sendData(String json)
 	{
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		Log.e("C2DM", "Action Url : "+pref.getString("SiteUrl", "gotNothing"));
 		String url = pref.getString("SiteUrl", "gotNothing");
 		String mail= pref.getString("MailAccount", "gotNothing");
+		Log.e("C2DM", "Action Url : "+url+" Mail Adress : "+mail);
 		
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
 		schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
@@ -146,11 +169,10 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 		SingleClientConnManager mgr = new SingleClientConnManager(params, schemeRegistry);
 
 		HttpClient client = new DefaultHttpClient(mgr, params);
-		HttpPost httppost = new HttpPost(url);
+		HttpPost httppost = new HttpPost(url+"/rcbu/parser");
 		try {
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
 	        nameValuePairs.add(new BasicNameValuePair("data", json));
-	        nameValuePairs.add(new BasicNameValuePair("mail", mail));
 	        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			HttpResponse response = client.execute(httppost);
 			Log.e("C2DM", "Reason : "+response.getStatusLine().getReasonPhrase()+" Code : "+response.getStatusLine().getStatusCode());

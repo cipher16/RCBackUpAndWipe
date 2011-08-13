@@ -2,46 +2,45 @@ package eu.grigis.gaetan.rc;
 
 import com.google.android.c2dm.C2DMessaging;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.Toast;
 
-public class RCMain extends Activity implements OnSharedPreferenceChangeListener {
+public class RCMain extends PreferenceActivity implements OnSharedPreferenceChangeListener {
     /** Called when the activity is first created. */
 
 	private SharedPreferences prefs;
-	private String url;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+    	super.onCreate(savedInstanceState);
+		addPreferencesFromResource(R.xml.preferences);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
-        
-        C2DMessaging.register(this, prefs.getString("SenderAdress", ""));
-        
-        url=prefs.getString("SiteUrl","");/*Default URL is in the preferences.xml*/
-        
-        TextView tv= (TextView)findViewById(R.id.info);
-        tv.setText("on a chopé une valeur !!!");
+        Log.e("C2DM", "RegId : "+prefs.getString("RegistrationID", ""));
+        if(prefs.getString("RegistrationID", "").length()==0)
+    	{
+        	register();
+    	}
     }
 
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {}
+	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
+		Toast.makeText(this.getApplicationContext(), "Catch argument : "+arg1, 5000).show();
+	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-    	menu.add(Menu.NONE,0,Menu.NONE,"Preferences").setAlphabeticShortcut('p');
+    	menu.add(Menu.NONE,0,Menu.NONE,"Register");
+    	menu.add(Menu.NONE,1,Menu.NONE,"UnRegister");
     	return(super.onCreateOptionsMenu(menu));
     }
 	@Override
@@ -49,8 +48,23 @@ public class RCMain extends Activity implements OnSharedPreferenceChangeListener
     {
     	switch(item.getItemId())
     	{
-	    	case 0:startActivity(new Intent(getBaseContext(),EditPreferences.class));return true;
+	    	case 0:register();return true;
+	    	case 1:C2DMessaging.unregister(getApplicationContext());return true;
     	}
 		return super.onOptionsItemSelected(item);
     }
+	
+	public void register()
+	{
+		//unregister before
+        if(prefs.getString("RegistrationID", "").length()>0)
+        {
+        	C2DMessaging.unregister(getApplicationContext());
+        	Log.e("C2DM", "Unregistering");
+        }
+    	Log.e("C2DM", "RegID : "+prefs.getString("RegistrationID", ""));
+    	Log.e("C2DM", "RegMail : "+prefs.getString("SenderAdress", ""));
+        C2DMessaging.register(this, prefs.getString("SenderAdress", ""));
+		Toast.makeText(this.getApplicationContext(), "Registering with mail : "+prefs.getString("SenderAdress", ""), 5000).show();
+	}
 }

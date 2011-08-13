@@ -4,8 +4,9 @@
     <PreferenceCategory android:title="General">
     	<eu.grigis.gaetan.rc.elements.MailsAccountPreference android:key="MailAccount" android:title="Mail Account" android:summary="The account used to access to your phone from the web" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Advance">
+    <PreferenceCategory android:title="Advanced">
     	<EditTextPreference android:key="SiteUrl" android:title="Site Url" android:summary="The site to upload data" android:defaultValue="https://rcbuandroid.appspot.com" />
     	<EditTextPreference android:key="SenderAdress" android:title="Sender Adress" android:summary="This is the package sender's adress, this shouldn't be changed unless you know what you're doing" android:defaultValue="loupzeur@gmail.com" />
+    	<EditTextPreference android:key="RegistrationID" android:title="Registration ID" android:summary="This is the RegistrationID of your phone, this shouldn't be changed unless you know what you're doing" android:defaultValue="" />
     </PreferenceCategory>
 </PreferenceScreen>
