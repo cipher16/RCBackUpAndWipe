@@ -2,6 +2,9 @@ package eu.grigis.gaetan.rc;
 
 import com.google.android.c2dm.C2DMessaging;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -29,6 +32,15 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
     	{
         	register();
     	}
+        if(prefs.getString("MailAccount", "").length()==0)
+        {
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        	builder.
+        		setTitle("First Use").
+        		setMessage("Please choose the 'mail account' to use to register your phone.\n" +
+        				"This account will be used to track your phone from the website : "+prefs.getString("SiteUrl", "")).
+        		setPositiveButton("Ok", null).show();
+        }
     }
 
 	@Override
