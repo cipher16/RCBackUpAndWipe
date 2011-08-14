@@ -3,6 +3,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="General">
     	<eu.grigis.gaetan.rc.elements.MailsAccountPreference android:key="MailAccount" android:title="Mail Account" android:summary="The account used to access to your phone from the web" />
+		<CheckBoxPreference android:key="UseGPS" android:title="Use GPS" android:summary="Use true GPS location instead of last known location" android:defaultValue="true"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Advanced">
     	<EditTextPreference android:key="SiteUrl" android:title="Site Url" android:summary="The site to upload data" android:defaultValue="https://rcbuandroid.appspot.com" />

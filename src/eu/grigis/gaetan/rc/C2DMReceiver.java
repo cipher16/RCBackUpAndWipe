@@ -23,11 +23,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -84,7 +86,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 		dt.setSender(pref.getString("SenderAdress", "gotNothing"));
 		
 		HashMap<String, String> data = new HashMap<String, String>();
-		
+		dt.setData(data);
 		switch (action.valueOf(a)) {
 			case RING:
 				try{
@@ -101,16 +103,16 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 			break;
 			case STATUS:
 				TelephonyManager tm=(TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-				data.put("Network Type", tm.getNetworkType()+"");
-				data.put("Call State", tm.getCallState()+"");
-				data.put("Data State", tm.getDataState()+"");
+				data.put("Network Type", getNameOfEnum("networktype",tm.getNetworkType()));
+				data.put("Call State", getNameOfEnum("callstate",tm.getCallState()));
+				data.put("Data State", getNameOfEnum("datastate",tm.getDataState()));
 				data.put("Device ID", tm.getDeviceId()+"");
 				data.put("Phone Number", tm.getLine1Number()+"");
 				data.put("Network Country", tm.getNetworkCountryIso()+"");
 				data.put("Network Operator Number", tm.getNetworkOperator()+"");
 				data.put("Network Operator Name", tm.getNetworkOperatorName()+"");
-				data.put("Phone Type", tm.getPhoneType()+"");
-				data.put("Sim State", tm.getSimState()+"");
+				data.put("Phone Type", getNameOfEnum("phonetype",tm.getPhoneType()));
+				data.put("Sim State", getNameOfEnum("simstate",tm.getSimState()));
 				
 				Log.e("C2DM", "Network Type : "+tm.getNetworkType());
 				Log.e("C2DM", "Call State : "+tm.getCallState());
@@ -126,10 +128,20 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 			case GEOLOC:
 				LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 				Criteria criteria = new Criteria();
-				String bestProvider = locationManager.getBestProvider(criteria, false);
+				criteria.setAccuracy(Criteria.ACCURACY_FINE);
+				String bestProvider = locationManager.getBestProvider(criteria, true);
 				Log.e("C2DM", "Best Provider : "+bestProvider);
 				Location location = locationManager.getLastKnownLocation(bestProvider);
-				if(location!=null)
+				
+				/*if enabled getting fresh data is a priority*/
+				if(pref.getBoolean("UseGPS", false)&&bestProvider.length()>0)
+				{
+					Log.e("C2DM", "Using request location");
+					//if no data available send data when available
+					locationManager.requestLocationUpdates(bestProvider, 1, 0, new LocListener(dt));
+					return;
+				}
+				else if(location!=null)
 				{
 					data.put("long", location.getLongitude()+"");
 					data.put("lat", location.getLatitude()+"");
@@ -175,5 +187,87 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 			HttpResponse response = client.execute(httppost);
 			Log.e("C2DM", "Reason : "+response.getStatusLine().getReasonPhrase()+" Code : "+response.getStatusLine().getStatusCode());
 		} catch (Exception e) {}
+	}
+	
+	public String getNameOfEnum(String name, int value)
+	{
+		HashMap<String, String> h = new HashMap<String, String>();
+		h.put("networktype0", "Unknown");
+		h.put("networktype1", "GPRS");
+		h.put("networktype2", "EDGE");
+		h.put("networktype3", "UMTS");
+		h.put("networktype4", "CDMA");
+		h.put("networktype5", "EVDO rev 0");
+		h.put("networktype6", "EVDO rev A");
+		h.put("networktype7", "1xRTT");
+		h.put("networktype8", "HSDPA");
+		h.put("networktype9", "HSUPA");
+		h.put("networktype10", "HSPA");
+		h.put("networktype11", "iDen");
+		h.put("networktype12", "EVDO rev B");
+		h.put("networktype13", "LTE");
+		h.put("networktype14", "eHRPD");
+		h.put("networktype15", "HSPA+");
+
+		h.put("phonetype0", "None");
+		h.put("phonetype1", "GSM");
+		h.put("phonetype2", "CDMA");
+		h.put("phonetype3", "SIP");
+		
+		h.put("callstate0", "Idle");
+		h.put("callstate1", "Ringing");
+		h.put("callstate2", "OffHook");
+
+		h.put("dataactivity0", "None");
+		h.put("dataactivity1", "In traffic");
+		h.put("dataactivity2", "OffHook");
+		h.put("dataactivity3", "In/Out traffic");
+		h.put("dataactivity4", "Link Down");
+
+		h.put("datastate0", "Disconnecting");
+		h.put("datastate1", "Connecting");
+		h.put("datastate2", "Connected");
+		h.put("datastate3", "Suspended");
+
+		h.put("simstate0", "Unknown");
+		h.put("simstate1", "Absent");
+		h.put("simstate2", "Pin Required");
+		h.put("simstate3", "Puk Required");
+		h.put("simstate4", "Locked");
+		h.put("simstate5", "Ready");
+		return h.get(name+value);
+	}
+	
+	private class LocListener implements LocationListener {
+
+		private DataTransfer d;
+		public LocListener(DataTransfer dt) {
+			d=dt;
+		}
+
+		@Override
+		public void onLocationChanged(Location location) {
+			if(location==null)
+				return;
+			HashMap<String, String> data = d.getData();
+			data.put("long", location.getLongitude()+"");
+			data.put("lat", location.getLatitude()+"");
+			data.put("speed", location.getSpeed()+"");
+			data.put("altitude", location.getAltitude()+"");
+			data.put("time", location.getTime()+"");
+			data.put("provider", location.getProvider()+"");
+			data.put("accuracy", location.getAccuracy()+"");
+			sendData(generateJson(d));
+			
+			LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+			locationManager.removeUpdates(this);//stop update
+		}
+
+		@Override public void onProviderDisabled(String arg0) {}
+
+		@Override public void onProviderEnabled(String arg0) {}
+
+		@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+		
 	}
 }
