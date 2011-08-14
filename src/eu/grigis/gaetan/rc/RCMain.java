@@ -64,7 +64,8 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
         }
     	Log.e("C2DM", "RegID : "+prefs.getString("RegistrationID", ""));
     	Log.e("C2DM", "RegMail : "+prefs.getString("SenderAdress", ""));
+    	Log.e("C2DM", "MailAccount : "+prefs.getString("MailAccount", ""));
         C2DMessaging.register(this, prefs.getString("SenderAdress", ""));
-		Toast.makeText(this.getApplicationContext(), "Registering with mail : "+prefs.getString("SenderAdress", ""), 5000).show();
+		Toast.makeText(this.getApplicationContext(), "Registering with mail : "+prefs.getString("MailAccount", ""), 5000).show();
 	}
 }

@@ -47,7 +47,6 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	 *
 	 */
 	private enum action {STATUS,WIPE,GEOLOC,RING,AUTH}
-	private static String registrationID;
 	public C2DMReceiver() {
 		super("dummy@google.com");
 	}
@@ -57,10 +56,9 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 			throws java.io.IOException {
 		Log.e("C2DM", "Registration ID arrived: Fantastic!!!");
 		Log.e("C2DM", registrationId);
-		registrationID = registrationId;
 		
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		pref.edit().putString("RegistrationID", registrationID).commit();
+		pref.edit().putString("RegistrationID", registrationId).commit();
 		launchAction("AUTH");//to send link between phone and mail account
 	};
 
@@ -78,12 +76,12 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	public void launchAction(String a)
 	{
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		String mail= pref.getString("MailAccount", "gotNothing");
 		
 		DataTransfer dt = new DataTransfer();
 		dt.setType(a);
-		dt.setId(registrationID);
-		dt.setMail(mail);
+		dt.setId(pref.getString("RegistrationID", "gotNothing"));
+		dt.setMail(pref.getString("MailAccount", "gotNothing"));
+		dt.setSender(pref.getString("SenderAdress", "gotNothing"));
 		
 		HashMap<String, String> data = new HashMap<String, String>();
 		
