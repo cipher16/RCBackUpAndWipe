@@ -25,7 +25,7 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         Log.e("C2DM", "RegId : "+prefs.getString("RegistrationID", ""));
-        if(prefs.getString("RegistrationID", "").length()==0)
+        if(prefs.getString("RegistrationID", "").length()==0&&prefs.getString("MailAccount", "").length()!=0)
     	{
         	register();
     	}
@@ -33,14 +33,18 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
-		Toast.makeText(this.getApplicationContext(), "Catch argument : "+arg1, 5000).show();
+		if(arg1.equals("MailAccount"))
+		{
+			Log.e("C2DM", "MailAccount Change : "+prefs.getString("MailAccount", ""));
+			register();
+		}
 	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-    	menu.add(Menu.NONE,0,Menu.NONE,"Register");
-    	menu.add(Menu.NONE,1,Menu.NONE,"UnRegister");
+//    	menu.add(Menu.NONE,0,Menu.NONE,"Register");
+//    	menu.add(Menu.NONE,1,Menu.NONE,"UnRegister");
     	return(super.onCreateOptionsMenu(menu));
     }
 	@Override

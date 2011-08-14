@@ -30,6 +30,8 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -48,6 +50,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	 * @author kikoolol
 	 *
 	 */
+	private static boolean GPSLock = false;// lock GPS until the response is got
 	private enum action {STATUS,WIPE,GEOLOC,RING,AUTH}
 	public C2DMReceiver() {
 		super("dummy@google.com");
@@ -128,7 +131,8 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 			case GEOLOC:
 				LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 				Criteria criteria = new Criteria();
-				criteria.setAccuracy(Criteria.ACCURACY_FINE);
+				if(pref.getBoolean("UseGPS", false))
+					criteria.setAccuracy(Criteria.ACCURACY_FINE);
 				String bestProvider = locationManager.getBestProvider(criteria, true);
 				Log.e("C2DM", "Best Provider : "+bestProvider);
 				Location location = locationManager.getLastKnownLocation(bestProvider);
@@ -136,12 +140,16 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 				/*if enabled getting fresh data is a priority*/
 				if(pref.getBoolean("UseGPS", false)&&bestProvider.length()>0)
 				{
+					if(GPSLock)
+						return;//send nothing
+					GPSLock=true;
 					Log.e("C2DM", "Using request location");
 					//if no data available send data when available
-					locationManager.requestLocationUpdates(bestProvider, 1, 0, new LocListener(dt));
-					return;
+//					locationManager.requestLocationUpdates(bestProvider, 1000, 0, new LocListener(dt));
+					startThread(bestProvider, dt);
 				}
-				else if(location!=null)
+				//send data even if we send it later with the 
+				if(location!=null)
 				{
 					data.put("long", location.getLongitude()+"");
 					data.put("lat", location.getLatitude()+"");
@@ -156,6 +164,19 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 		}
 		dt.setData(data);
 		sendData(generateJson(dt));
+	}
+	
+	public void startThread(final String provider,final DataTransfer dt)
+	{
+		Thread th = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				((LocationManager) getSystemService(LOCATION_SERVICE)).requestLocationUpdates(provider, 1000, 0, new LocListener(dt));
+			}
+		});
+		th.setDaemon(true);
+		th.run();
 	}
 	
 	public String generateJson(DataTransfer dt)
@@ -238,15 +259,31 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 		return h.get(name+value);
 	}
 	
-	private class LocListener implements LocationListener {
-
+	public class LocListener extends Handler implements LocationListener {
 		private DataTransfer d;
+		private int counter;
+		
 		public LocListener(DataTransfer dt) {
+			counter=0;
 			d=dt;
+			this.sendMessageDelayed(new Message(), (long)5000);
+		}
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			counter++;
+			Log.e("C2DM", "Current counter : "+counter);
+			if(counter>=5)
+			{
+				Log.e("C2DM", "Disabling");
+				counter=0;
+				((LocationManager) getSystemService(LOCATION_SERVICE)).removeUpdates(this);
+			}
 		}
 
 		@Override
 		public void onLocationChanged(Location location) {
+			GPSLock=false;
 			if(location==null)
 				return;
 			HashMap<String, String> data = d.getData();
@@ -259,15 +296,18 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 			data.put("accuracy", location.getAccuracy()+"");
 			sendData(generateJson(d));
 			
-			LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-			locationManager.removeUpdates(this);//stop update
+			((LocationManager) getSystemService(LOCATION_SERVICE)).removeUpdates(this);
+			//stop update
 		}
 
-		@Override public void onProviderDisabled(String arg0) {}
+		@Override public void onProviderDisabled(String arg0) {//stop everything on DC
+			((LocationManager) getSystemService(LOCATION_SERVICE)).removeUpdates(this);
+		}
 
 		@Override public void onProviderEnabled(String arg0) {}
 
-		@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-		
+		@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+			Log.e("C2DM", "Status Changed : "+arg0+" "+arg1);
+		}
 	}
 }
