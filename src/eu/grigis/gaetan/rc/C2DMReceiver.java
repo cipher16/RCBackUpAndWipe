@@ -1,44 +1,25 @@
 package eu.grigis.gaetan.rc;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.google.android.c2dm.C2DMBaseReceiver;
-import com.google.gson.Gson;
+
+import eu.grigis.gaetan.rc.data.DataTransfer;
+import eu.grigis.gaetan.rc.elements.GPSTask;
 
 public class C2DMReceiver extends C2DMBaseReceiver {
 	
@@ -51,7 +32,6 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	 * @author kikoolol
 	 *
 	 */
-	private static boolean GPSLock = false;// lock GPS until the response is got
 	private enum action {STATUS,WIPE,GEOLOC,RING,AUTH}
 	public C2DMReceiver() {
 		super("dummy@google.com");
@@ -139,16 +119,19 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 				Location location = locationManager.getLastKnownLocation(bestProvider);
 				
 				/*if enabled getting fresh data is a priority*/
-//Doesn't work until find a workaround to the global freeze
-//				if(pref.getBoolean("UseGPS", false)&&bestProvider.length()>0)
-//				{
-//					if(GPSLock)
-//						return;//send nothing
-//					GPSLock=true;
-//					Log.e("C2DM", "Using request location");
-//					//if no data available send data when available
-//					//locationManager.requestLocationUpdates(bestProvider, 1000, 0, new LocListener(dt));
-//				}
+				if(pref.getBoolean("UseGPS", false)&&bestProvider.length()>0)
+				{
+					Log.e("C2DM", "Using request location -> GPSTask");
+					GPSTask g = new GPSTask(locationManager,pref,bestProvider);
+					try {
+						g.execute(dt);
+						if(g.get())//if false ... upload some data
+							return;
+					} catch (Exception e) {}
+					finally {
+						Log.i("C2DM","End of the GPS part task part");
+					}
+				}
 				//send data even if we send it later with the other one
 				if(location!=null)
 				{
@@ -166,38 +149,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 		if(data==null||data.isEmpty())
 			return; //do not send empty data
 		dt.setData(data);
-		sendData(generateJson(dt));
-	}
-	
-	public String generateJson(DataTransfer dt)
-	{
-		Gson gson = new Gson();
-		String json = gson.toJson(dt);
-		Log.e("C2DM", "JSON : "+json);
-		return 	json;
-	}
-
-	public void sendData(String json)
-	{
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		String url = pref.getString("SiteUrl", "gotNothing");
-		String mail= pref.getString("MailAccount", "gotNothing");
-		Log.e("C2DM", "Action Url : "+url+" Mail Adress : "+mail);
-		
-		SchemeRegistry schemeRegistry = new SchemeRegistry();
-		schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-		HttpParams params = new BasicHttpParams();
-		SingleClientConnManager mgr = new SingleClientConnManager(params, schemeRegistry);
-
-		HttpClient client = new DefaultHttpClient(mgr, params);
-		HttpPost httppost = new HttpPost(url+"/rcbu/parser");
-		try {
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-	        nameValuePairs.add(new BasicNameValuePair("data", json));
-	        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-			HttpResponse response = client.execute(httppost);
-			Log.e("C2DM", "Reason : "+response.getStatusLine().getReasonPhrase()+" Code : "+response.getStatusLine().getStatusCode());
-		} catch (Exception e) {}
+		DataTransfer.sendData(pref,dt);
 	}
 	
 	public String getNameOfEnum(String name, int value)
@@ -249,59 +201,4 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 		return h.get(name+value);
 	}
 	
-	public class LocListener extends Handler implements LocationListener {
-		private DataTransfer d;
-		private int counter;
-		private Looper loop;
-		public LocListener(DataTransfer dt,Looper l) {
-			counter=0;
-			d=dt;
-			loop=l;
-			Log.e("C2DM", "Thread is running  : "+loop.getThread().getId());
-			this.sendMessageDelayed(new Message(), (long)1000);
-		}
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			counter++;
-			Log.e("C2DM", "Current counter : "+counter);
-			if(counter>=5)
-			{
-				Log.e("C2DM", "Disabling");
-				counter=0;
-				((LocationManager) getSystemService(LOCATION_SERVICE)).removeUpdates(this);
-			}
-		}
-
-		@Override
-		public void onLocationChanged(Location location) {
-			GPSLock=false;
-			if(location==null)
-				return;
-			HashMap<String, String> data = d.getData();
-			data.put("long", location.getLongitude()+"");
-			data.put("lat", location.getLatitude()+"");
-			data.put("speed", location.getSpeed()+"");
-			data.put("altitude", location.getAltitude()+"");
-			data.put("time", location.getTime()+"");
-			data.put("provider", location.getProvider()+"");
-			data.put("accuracy", location.getAccuracy()+"");
-			sendData(generateJson(d));
-			
-			((LocationManager) getSystemService(LOCATION_SERVICE)).removeUpdates(this);
-			loop.quit();//release thread
-			//stop update
-		}
-
-		@Override public void onProviderDisabled(String arg0) {//stop everything on DC
-			((LocationManager) getSystemService(LOCATION_SERVICE)).removeUpdates(this);
-			loop.quit();
-		}
-
-		@Override public void onProviderEnabled(String arg0) {/*nothing to do ... we are disabled now*/}
-
-		@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-			Log.e("C2DM", "Status Changed : "+arg0+" "+arg1);
-		}
-	}
 }
