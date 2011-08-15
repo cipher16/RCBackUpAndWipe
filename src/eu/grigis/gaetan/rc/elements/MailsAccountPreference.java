@@ -16,8 +16,8 @@ public class MailsAccountPreference extends ListPreference {
 		
 		int i=0;
 		for (Account account : accounts) {
-			System.out.println(account.type);
-			strings[i++]=account.name;
+			if(account.type.equals("com.google"))
+				strings[i++]=account.name;
 		}
 		setEntries(strings);
 		setEntryValues(strings);

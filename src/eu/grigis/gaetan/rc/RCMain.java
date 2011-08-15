@@ -37,8 +37,7 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
         	builder.
         		setTitle("First Use").
-        		setMessage("Please choose the 'mail account' to use to register your phone.\n" +
-        				"This account will be used to track your phone from the website : "+prefs.getString("SiteUrl", "")).
+        		setMessage(R.string.intro+prefs.getString("SiteUrl", "")).
         		setPositiveButton("Ok", null).show();
         }
     }
@@ -82,6 +81,6 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
     	Log.e("C2DM", "RegMail : "+prefs.getString("SenderAdress", ""));
     	Log.e("C2DM", "MailAccount : "+prefs.getString("MailAccount", ""));
         C2DMessaging.register(this, prefs.getString("SenderAdress", ""));
-		Toast.makeText(this.getApplicationContext(), "Registering with mail : "+prefs.getString("MailAccount", ""), 5000).show();
+		Toast.makeText(this.getApplicationContext(), R.string.registered+prefs.getString("MailAccount", ""), 5000).show();
 	}
 }

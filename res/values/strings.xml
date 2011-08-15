@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<!-- Main app -->
     <string name="app_name">RCBackupAndWipe</string>
+    <string name="intro">Please choose the \'mail account\' to use to register your phone.\nThis account will be used to track your phone from the website : </string>
+	<string name="registered">Registered with mail : </string>
+	
+	<!-- Preferences -->
+	<string name="prefConfGeneral">General</string>
+	<string name="prefConfAdvanced">Advanced</string>
+	
+	<string name="prefTitleUseGps">Use GPS</string>
+	<string name="prefSumUseGps">Force the use of the GPS</string>
+	
+	<string name="prefTitleMailAccount">Mail account</string>
+	<string name="prefSumMailAccount">The account used to access to your phone\'s info from the web</string>
+	
+	<string name="prefTitleSiteurl">Site Url</string>
+	<string name="prefSumSiteurl">The site to upload data</string>
+	
+	<string name="prefTitleSender">Sender Adress</string>
+	<string name="prefSumSender">This is the package sender\'s adress, this shouldn\'t be changed unless you know what you\'re doing</string>
+	
+	<string name="prefTitleRegid">Registration ID</string>
+	<string name="prefSumRegid">This is the RegistrationID of your phone, this shouldn\'t be changed unless you know what you\'re doing</string>
 </resources>
