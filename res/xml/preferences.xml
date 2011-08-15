@@ -3,7 +3,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/prefConfGeneral">
     	<eu.grigis.gaetan.rc.elements.MailsAccountPreference android:key="MailAccount" android:title="@string/prefTitleMailAccount" android:summary="@string/prefSumMailAccount" />
-		<CheckBoxPreference android:key="UseGPS" android:title="@string/prefTitleUseGps" android:summary="@string/prefSumUseGps" android:defaultValue="false"/>
+<!-- 		<CheckBoxPreference android:key="UseGPS" android:title="@string/prefTitleUseGps" android:summary="@string/prefSumUseGps" android:defaultValue="false"/> -->
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/prefConfAdvanced">
     	<EditTextPreference android:key="SiteUrl" android:title="@string/prefTitleSiteurl" android:summary="@string/prefSumSiteurl" android:defaultValue="https://rcbuandroid.appspot.com" />

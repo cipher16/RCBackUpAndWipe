@@ -31,6 +31,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -138,17 +139,17 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 				Location location = locationManager.getLastKnownLocation(bestProvider);
 				
 				/*if enabled getting fresh data is a priority*/
-				if(pref.getBoolean("UseGPS", false)&&bestProvider.length()>0)
-				{
-					if(GPSLock)
-						return;//send nothing
-					GPSLock=true;
-					Log.e("C2DM", "Using request location");
-					//if no data available send data when available
-//					locationManager.requestLocationUpdates(bestProvider, 1000, 0, new LocListener(dt));
-					startThread(bestProvider, dt);
-				}
-				//send data even if we send it later with the 
+//Doesn't work until find a workaround to the global freeze
+//				if(pref.getBoolean("UseGPS", false)&&bestProvider.length()>0)
+//				{
+//					if(GPSLock)
+//						return;//send nothing
+//					GPSLock=true;
+//					Log.e("C2DM", "Using request location");
+//					//if no data available send data when available
+//					//locationManager.requestLocationUpdates(bestProvider, 1000, 0, new LocListener(dt));
+//				}
+				//send data even if we send it later with the other one
 				if(location!=null)
 				{
 					data.put("long", location.getLongitude()+"");
@@ -162,21 +163,10 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 				}
 			break;
 		}
+		if(data==null||data.isEmpty())
+			return; //do not send empty data
 		dt.setData(data);
 		sendData(generateJson(dt));
-	}
-	
-	public void startThread(final String provider,final DataTransfer dt)
-	{
-		Thread th = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				((LocationManager) getSystemService(LOCATION_SERVICE)).requestLocationUpdates(provider, 1000, 0, new LocListener(dt));
-			}
-		});
-		th.setDaemon(true);
-		th.run();
 	}
 	
 	public String generateJson(DataTransfer dt)
@@ -262,11 +252,13 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	public class LocListener extends Handler implements LocationListener {
 		private DataTransfer d;
 		private int counter;
-		
-		public LocListener(DataTransfer dt) {
+		private Looper loop;
+		public LocListener(DataTransfer dt,Looper l) {
 			counter=0;
 			d=dt;
-			this.sendMessageDelayed(new Message(), (long)5000);
+			loop=l;
+			Log.e("C2DM", "Thread is running  : "+loop.getThread().getId());
+			this.sendMessageDelayed(new Message(), (long)1000);
 		}
 		@Override
 		public void handleMessage(Message msg) {
@@ -297,14 +289,16 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 			sendData(generateJson(d));
 			
 			((LocationManager) getSystemService(LOCATION_SERVICE)).removeUpdates(this);
+			loop.quit();//release thread
 			//stop update
 		}
 
 		@Override public void onProviderDisabled(String arg0) {//stop everything on DC
 			((LocationManager) getSystemService(LOCATION_SERVICE)).removeUpdates(this);
+			loop.quit();
 		}
 
-		@Override public void onProviderEnabled(String arg0) {}
+		@Override public void onProviderEnabled(String arg0) {/*nothing to do ... we are disabled now*/}
 
 		@Override public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 			Log.e("C2DM", "Status Changed : "+arg0+" "+arg1);

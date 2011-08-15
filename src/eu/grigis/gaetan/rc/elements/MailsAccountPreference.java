@@ -11,13 +11,12 @@ public class MailsAccountPreference extends ListPreference {
 	public MailsAccountPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
-		Account[] accounts = AccountManager.get(context).getAccounts();
+		Account[] accounts = AccountManager.get(context).getAccountsByType("com.google");
 		String[] strings=new String[accounts.length];
 		
 		int i=0;
 		for (Account account : accounts) {
-			if(account.type.equals("com.google"))
-				strings[i++]=account.name;
+			strings[i++]=account.name;
 		}
 		setEntries(strings);
 		setEntryValues(strings);
