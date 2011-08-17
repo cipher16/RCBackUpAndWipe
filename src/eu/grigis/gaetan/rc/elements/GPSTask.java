@@ -29,7 +29,7 @@ public class GPSTask extends AsyncTask<DataTransfer, Integer, Boolean> {
 		Looper l = Looper.myLooper();
 		lm.requestLocationUpdates(provider, 1000, 0, new LocListener(params[0],l,lm,pref));
 		Looper.loop();
-		Log.i(TAG,"GPS task Stopped !!");
+		Log.i(TAG,"GPS task Stopped with provider : "+provider+"!!");
 		return true;//doing the request
 	}
 }

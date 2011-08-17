@@ -116,10 +116,12 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 					criteria.setAccuracy(Criteria.ACCURACY_FINE);
 				String bestProvider = locationManager.getBestProvider(criteria, true);
 				Log.e("C2DM", "Best Provider : "+bestProvider);
+				
+				//to send some data
 				Location location = locationManager.getLastKnownLocation(bestProvider);
 				
 				/*if enabled getting fresh data is a priority*/
-				if(pref.getBoolean("UseGPS", false)&&bestProvider.length()>0)
+				if(bestProvider.length()>0)
 				{
 					Log.e("C2DM", "Using request location -> GPSTask");
 					GPSTask g = new GPSTask(locationManager,pref,bestProvider);
