@@ -40,8 +40,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	@Override
 	public void onRegistered(Context context, String registrationId)
 			throws java.io.IOException {
-		Log.e("C2DM", "Registration ID arrived: Fantastic!!!");
-		Log.e("C2DM", registrationId);
+		Log.e("C2DM", "RegID"+registrationId);
 		
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		pref.edit().putString("RegistrationID", registrationId).commit();

@@ -51,7 +51,7 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-    	menu.add(Menu.NONE,0,Menu.NONE,"Refresh Registration");
+//    	menu.add(Menu.NONE,0,Menu.NONE,"Refresh Registration");
 //    	menu.add(Menu.NONE,1,Menu.NONE,"UnRegister");
     	return(super.onCreateOptionsMenu(menu));
     }
