@@ -29,7 +29,7 @@ public class LocListener implements LocationListener {
 		lm=locMan;
 		pref=spref;
 		
-		t.schedule(new TimerTask() {@Override public void run() {stop(true);}}, 15000);
+		t.schedule(new TimerTask() {@Override public void run() {stop(true);}}, Integer.valueOf(pref.getString("GPSTimeOut", "30"))*1000);
 	}
 	@Override
 	public void onLocationChanged(Location location) {

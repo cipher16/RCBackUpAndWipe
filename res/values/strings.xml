@@ -2,7 +2,8 @@
 <resources>
 	<!-- Main app -->
     <string name="app_name">RCBackupAndWipe</string>
-    <string name="intro">Please choose the \'mail account\' to use to register your phone.\nThis account will be used to track your phone from the website : </string>
+    <string name="introTitle">First Use</string>
+	<string name="introSummary">Please choose the \'mail account\' to use to register your phone.\nThis account will be used to track your phone from the website : </string>
 	<string name="registered">Registered with mail : </string>
 	
 	<!-- Preferences -->
@@ -11,6 +12,9 @@
 	
 	<string name="prefTitleUseGps">Use GPS</string>
 	<string name="prefSumUseGps">Force the use of the GPS</string>
+	
+	<string name="prefTitleTimeOutGps">GPS Time Out</string>
+	<string name="prefSumTimeOutGps">Time before the GPS link is cut off to save battery</string>
 	
 	<string name="prefTitleMailAccount">Mail account</string>
 	<string name="prefSumMailAccount">The account used to access to your phone\'s info from the web</string>
