@@ -5,6 +5,7 @@
     <string name="introTitle">First Use</string>
 	<string name="introSummary">Please choose the \'mail account\' to use to register your phone.\nThis account will be used to track your phone from the website : </string>
 	<string name="registered">Registered with mail : </string>
+	<string name="noValidAccount">No valid account found</string>
 	
 	<!-- Preferences -->
 	<string name="prefConfGeneral">General</string>

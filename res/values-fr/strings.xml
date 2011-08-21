@@ -5,6 +5,7 @@
     <string name="introTitle">Première Utilisation</string>
     <string name="introSummary">Veuillez choisir l\'adresse mail avec laquelle vous allez recupérer les informations sur le site web : </string>
 	<string name="registered">Utilisation de l\'adresse mail : </string>
+	<string name="noValidAccount">Aucun compte valide trouvé</string>
 	
 	<!-- Preferences -->
 	<string name="prefConfGeneral">Configuration Générale</string>

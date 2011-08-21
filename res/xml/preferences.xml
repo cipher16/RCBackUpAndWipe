@@ -9,7 +9,7 @@
 			android:summary="@string/prefSumTimeOutGps" 
 			android:entries="@array/timeOutSec" 
 			android:entryValues="@array/timeOutSecValue" 
-			android:defaultValue="30"/>
+			android:defaultValue="60"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/prefConfAdvanced">
     	<EditTextPreference android:key="SiteUrl" android:title="@string/prefTitleSiteurl" android:summary="@string/prefSumSiteurl" android:defaultValue="https://rcbuandroid.appspot.com" />

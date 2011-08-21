@@ -25,7 +25,7 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         Log.e("C2DM", "RegId : "+prefs.getString("RegistrationID", ""));
-        if(prefs.getString("RegistrationID", "").length()==0&&prefs.getString("MailAccount", "").length()!=0)
+        if(prefs.getString("RegistrationID", "").length()==0&&prefs.getString("MailAccount", "").length()>0)
     	{
         	register();
     	}
@@ -69,6 +69,11 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 	public void register()
 	{
 		//unregister before
+		if(prefs.getString("MailAccount", "").length()==0)
+		{
+			Toast.makeText(this.getApplicationContext(), getString(R.string.noValidAccount), 5000).show();
+			return;
+		}
         if(prefs.getString("RegistrationID", "").length()>0)
         {
         	C2DMessaging.unregister(getApplicationContext());
