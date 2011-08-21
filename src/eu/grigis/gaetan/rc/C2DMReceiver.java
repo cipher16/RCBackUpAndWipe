@@ -147,7 +147,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 				}
 			break;
 		}
-		if(data==null||data.isEmpty())
+		if(!a.equals("AUTH")&&(data==null||data.isEmpty()))
 			return; //do not send empty data
 		dt.setData(data);
 		DataTransfer.sendData(pref,dt);
