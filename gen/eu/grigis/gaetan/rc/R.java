@@ -19,6 +19,7 @@ public final class R {
         public static final int rcbu=0x7f020001;
     }
     public static final class string {
+        public static final int adminRights=0x7f050007;
         /**  Main app 
  Main app 
          */
@@ -26,26 +27,29 @@ public final class R {
         public static final int introSummary=0x7f050002;
         public static final int introTitle=0x7f050001;
         public static final int noValidAccount=0x7f050004;
-        public static final int prefConfAdvanced=0x7f050006;
+        public static final int prefConfAdvanced=0x7f050009;
         /**  Preferences 
  Preferences 
          */
-        public static final int prefConfGeneral=0x7f050005;
-        public static final int prefSumMailAccount=0x7f05000c;
-        public static final int prefSumRegid=0x7f050012;
-        public static final int prefSumSender=0x7f050010;
-        public static final int prefSumSiteurl=0x7f05000e;
-        public static final int prefSumTimeOutGps=0x7f05000a;
-        public static final int prefSumUseGps=0x7f050008;
-        public static final int prefTitleMailAccount=0x7f05000b;
-        public static final int prefTitleRegid=0x7f050011;
-        public static final int prefTitleSender=0x7f05000f;
-        public static final int prefTitleSiteurl=0x7f05000d;
-        public static final int prefTitleTimeOutGps=0x7f050009;
-        public static final int prefTitleUseGps=0x7f050007;
+        public static final int prefConfGeneral=0x7f050008;
+        public static final int prefSumMailAccount=0x7f05000f;
+        public static final int prefSumRegid=0x7f050015;
+        public static final int prefSumSender=0x7f050013;
+        public static final int prefSumSiteurl=0x7f050011;
+        public static final int prefSumTimeOutGps=0x7f05000d;
+        public static final int prefSumUseGps=0x7f05000b;
+        public static final int prefTitleMailAccount=0x7f05000e;
+        public static final int prefTitleRegid=0x7f050014;
+        public static final int prefTitleSender=0x7f050012;
+        public static final int prefTitleSiteurl=0x7f050010;
+        public static final int prefTitleTimeOutGps=0x7f05000c;
+        public static final int prefTitleUseGps=0x7f05000a;
+        public static final int regOkSummary=0x7f050006;
+        public static final int regOkTitle=0x7f050005;
         public static final int registered=0x7f050003;
     }
     public static final class xml {
-        public static final int preferences=0x7f030000;
+        public static final int admin=0x7f030000;
+        public static final int preferences=0x7f030001;
     }
 }

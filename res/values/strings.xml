@@ -7,6 +7,9 @@
 	<string name="registered">Registered with mail : </string>
 	<string name="noValidAccount">No valid account found</string>
 	
+	<string name="regOkTitle">Registration OK</string>
+	<string name="regOkSummary">Your registration is valid, you are now be able to get info from your phone from this url : </string>
+	<string name="adminRights">Need some administrators right to make this software works</string>
 	<!-- Preferences -->
 	<string name="prefConfGeneral">General</string>
 	<string name="prefConfAdvanced">Advanced</string>

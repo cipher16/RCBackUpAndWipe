@@ -7,6 +7,9 @@
 	<string name="registered">Utilisation de l\'adresse mail : </string>
 	<string name="noValidAccount">Aucun compte valide trouvé</string>
 	
+	<string name="regOkTitle">Votre compte a été validé</string>
+	<string name="regOkSummary">Votre compte est valide, vous pouvez désormais récupérer les info sur le site  : </string>
+	<string name="adminRights">L\'application a besoin de droits administrateurs pour fonctionner</string>
 	<!-- Preferences -->
 	<string name="prefConfGeneral">Configuration Générale</string>
 	<string name="prefConfAdvanced">Configuration avancée</string>

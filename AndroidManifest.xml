@@ -43,5 +43,14 @@
 				<category android:name="eu.grigis.gaetan.rc" />
 			</intent-filter>
 		</receiver>
+		
+		<receiver android:name="eu.grigis.gaetan.rc.elements.AdminDevice"
+			android:label="RCBU"
+        	android:permission="android.permission.BIND_DEVICE_ADMIN">
+		    <meta-data android:name="android.app.device_admin" android:resource="@xml/admin" />
+		    <intent-filter>
+		        <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+		    </intent-filter>
+		</receiver>
     </application>
 </manifest>
