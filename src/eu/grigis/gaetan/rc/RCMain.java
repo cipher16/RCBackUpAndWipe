@@ -66,7 +66,7 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 			startActivityForResult(intent, 0);
 		}
     }
-
+    
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
 		if(arg1.equals("MailAccount"))
@@ -76,6 +76,20 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 		}
 	}
 	
+	public void register()
+	{
+		//unregister before
+		if(prefs.getString("MailAccount", "").length()==0)
+		{
+			Toast.makeText(this.getApplicationContext(), getString(R.string.noValidAccount), 5000).show();
+			return;
+		}
+    	Log.i("C2DM", "RegID : "+prefs.getString("RegistrationID", ""));
+    	Log.i("C2DM", "RegMail : "+prefs.getString("SenderAdress", ""));
+    	Log.i("C2DM", "MailAccount : "+prefs.getString("MailAccount", ""));
+        C2DMessaging.register(this, prefs.getString("SenderAdress", ""));
+		Toast.makeText(this.getApplicationContext(), getString(R.string.registered)+prefs.getString("MailAccount", ""), 5000).show();
+	}
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -93,28 +107,6 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
     	}
 		return super.onOptionsItemSelected(item);
     }
-	
-	public void register()
-	{
-		//unregister before
-		if(prefs.getString("MailAccount", "").length()==0)
-		{
-			Toast.makeText(this.getApplicationContext(), getString(R.string.noValidAccount), 5000).show();
-			return;
-		}
-//		No need to unregister data
-//        if(prefs.getString("RegistrationID", "").length()>0)
-//        {
-//        	C2DMessaging.unregister(getApplicationContext());
-//        	Log.e("C2DM", "Unregistering");
-//        }
-    	Log.i("C2DM", "RegID : "+prefs.getString("RegistrationID", ""));
-    	Log.i("C2DM", "RegMail : "+prefs.getString("SenderAdress", ""));
-    	Log.i("C2DM", "MailAccount : "+prefs.getString("MailAccount", ""));
-        C2DMessaging.register(this, prefs.getString("SenderAdress", ""));
-		Toast.makeText(this.getApplicationContext(), getString(R.string.registered)+prefs.getString("MailAccount", ""), 5000).show();
-	}
-	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {

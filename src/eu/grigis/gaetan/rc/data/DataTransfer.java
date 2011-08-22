@@ -227,7 +227,7 @@ public class DataTransfer implements Serializable {
 		if(!a.equals("AUTH")&&(data==null||data.isEmpty()))
 			return; //do not send empty data
 		dt.setData(data);
-		DataTransfer.sendData(pref,dt);
+		sendData(pref,dt);
 	}
 	
 	public static String getNameOfEnum(String name, int value)
