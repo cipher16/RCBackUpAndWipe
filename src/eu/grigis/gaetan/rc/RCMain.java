@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -26,7 +27,6 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 	private SharedPreferences prefs;
 	private DevicePolicyManager dpm;
 	private ComponentName adminName;
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
@@ -34,25 +34,20 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         Log.i("C2DM", "RegId : "+prefs.getString("RegistrationID", ""));
+
+    	displayInfo(getString(R.string.introTitle), getString(R.string.introSummary)+" "+prefs.getString("SiteUrl", ""));
+        /*Display message in case there is no regId*/
         if(prefs.getString("RegistrationID", "").length()==0&&prefs.getString("MailAccount", "").length()>0)
-    	{
+        {
         	register();
-    	}
-        else
-        {
-        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        	builder.
-        		setTitle(R.string.regOkTitle).
-        		setMessage(getString(R.string.regOkSummary)+prefs.getString("SiteUrl", "")).
-        		setPositiveButton("Ok", null).show();
         }
-        if(prefs.getString("MailAccount", "").length()==0)
+        /*If regId exist and account too*/
+        if(prefs.getString("RegistrationID", "").length()>0&&prefs.getString("MailAccount", "").length()>0)
         {
-        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        	builder.
-        		setTitle(R.string.introTitle).
-        		setMessage(getString(R.string.introSummary)+prefs.getString("SiteUrl", "")).
-        		setPositiveButton("Ok", null).show();
+        	displayInfo(
+        		getString(R.string.regOkTitle),
+    			getString(R.string.regOkSummary)+" "+prefs.getString("SiteUrl", "")+" "+getString(R.string.regOkSummary2 )+" "+prefs.getString("MailAccount", "")
+    		);
         }
         
         /*DeviceAdmin part must run on main activity :s*/
@@ -66,6 +61,14 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 			startActivityForResult(intent, 0);
 		}
     }
+    private void displayInfo(String title,String summary)
+    {
+    	Preference prefInfo = getPreferenceScreen().findPreference("info");
+    	if(prefInfo==null)
+    		return;
+    	prefInfo.setTitle(title);
+    	prefInfo.setSummary(summary);
+    }
     
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
@@ -73,9 +76,19 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 		{
 			Log.i("C2DM", "MailAccount Change : "+prefs.getString("MailAccount", ""));
 			register();
+		}else if(arg1.equals("RegistrationID"))
+		{/*in case this is called from C2DMReceiver*/
+			this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					displayInfo(
+			        		getString(R.string.regOkTitle),
+			    			getString(R.string.regOkSummary)+" "+prefs.getString("SiteUrl", "")+" "+getString(R.string.regOkSummary2 )+" "+prefs.getString("MailAccount", "")
+			    		);
+				}
+			});
 		}
 	}
-	
 	public void register()
 	{
 		//unregister before

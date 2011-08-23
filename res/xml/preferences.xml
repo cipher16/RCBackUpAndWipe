@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
+  	<Preference android:key="info" android:title="@string/introTitle" android:summary="@string/introSummary" />
     <PreferenceCategory android:title="@string/prefConfGeneral">
     	<eu.grigis.gaetan.rc.elements.MailsAccountPreference android:key="MailAccount" android:title="@string/prefTitleMailAccount" android:summary="@string/prefSumMailAccount" />
 		<CheckBoxPreference android:key="UseGPS" android:title="@string/prefTitleUseGps" android:summary="@string/prefSumUseGps" android:defaultValue="false"/>
