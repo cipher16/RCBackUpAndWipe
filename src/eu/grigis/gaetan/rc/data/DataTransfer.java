@@ -20,6 +20,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Criteria;
@@ -35,6 +36,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import eu.grigis.gaetan.rc.elements.AdminDevice;
 import eu.grigis.gaetan.rc.elements.GPSTask;
 
 
@@ -154,7 +156,13 @@ public class DataTransfer implements Serializable {
 		switch (action.valueOf(a.toUpperCase())) {
 			case LOCK:
 				DevicePolicyManager dpm = (DevicePolicyManager)context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-				dpm.resetPassword(pass, 0);
+				if(!dpm.resetPassword(pass, 0))
+				{/*unable to change password*/
+					dpm.setPasswordMinimumLength(new ComponentName(context,AdminDevice.class), 0);
+					dpm.setPasswordQuality(new ComponentName(context,AdminDevice.class), DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED);
+					dpm.resetPassword(pass, 1);
+				}
+				
 				//if pass length > 0 lock if == just unlock
 				if(pass.length()>0)
 					dpm.lockNow();
