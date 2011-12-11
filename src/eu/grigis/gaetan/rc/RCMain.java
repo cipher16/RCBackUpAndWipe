@@ -2,6 +2,7 @@ package eu.grigis.gaetan.rc;
 
 import com.google.android.c2dm.C2DMessaging;
 
+import eu.grigis.gaetan.rc.data.DataTransfer;
 import eu.grigis.gaetan.rc.elements.AdminDevice;
 
 import android.app.Activity;
@@ -12,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -27,10 +29,24 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 	private SharedPreferences prefs;
 	private DevicePolicyManager dpm;
 	private ComponentName adminName;
+
+	private static MediaPlayer mMediaPlayer;
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
+		
+		Intent inte = getIntent();
+		if(inte!=null)//to disable alarm on notification click
+		{
+			if(inte.getAction().equals("eu.grigis.gaetan.STOP_ALARM"))
+			{
+					getAlarmPlayer().stop();
+					getAlarmPlayer().release();
+					Toast.makeText(this.getApplicationContext(), getString(R.string.stoppedAlarm), 5000).show();
+			}
+		}
+		
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         Log.i("C2DM", "RegId : "+prefs.getString("RegistrationID", ""));
@@ -61,6 +77,14 @@ public class RCMain extends PreferenceActivity implements OnSharedPreferenceChan
 			startActivityForResult(intent, 0);
 		}
     }
+    
+    public static MediaPlayer getAlarmPlayer()
+    {
+    	if(mMediaPlayer==null)
+    		mMediaPlayer = new MediaPlayer();
+    	return mMediaPlayer;
+    }
+    
     private void displayInfo(String title,String summary)
     {
     	Preference prefInfo = getPreferenceScreen().findPreference("info");

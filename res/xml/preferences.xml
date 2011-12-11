@@ -13,6 +13,7 @@
 			android:defaultValue="60"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/prefConfAdvanced">
+<!--     	<Preference android:key="advInfo" android:title="Change " android:summary="Just some more info about this shit"/> -->
     	<EditTextPreference android:key="SiteUrl" android:title="@string/prefTitleSiteurl" android:summary="@string/prefSumSiteurl" android:defaultValue="https://rcbuandroid.appspot.com" />
     	<EditTextPreference android:key="SenderAdress" android:title="@string/prefTitleSender" android:summary="@string/prefSumSender" android:defaultValue="loupzeur@gmail.com" />
     	<EditTextPreference android:key="RegistrationID" android:title="@string/prefTitleRegid" android:summary="@string/prefSumRegid" android:defaultValue="" />

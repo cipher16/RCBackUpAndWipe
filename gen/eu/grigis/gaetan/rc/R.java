@@ -27,6 +27,7 @@ public final class R {
         public static final int introSummary=0x7f050002;
         public static final int introTitle=0x7f050001;
         public static final int noValidAccount=0x7f050004;
+        public static final int notifAlarmRunning=0x7f050018;
         public static final int prefConfAdvanced=0x7f05000a;
         /**  Preferences 
  Preferences 
@@ -48,6 +49,9 @@ public final class R {
         public static final int regOkSummary2=0x7f050007;
         public static final int regOkTitle=0x7f050005;
         public static final int registered=0x7f050003;
+        public static final int stoppedAlarm=0x7f050017;
+        public static final int texteStopTheAlarm=0x7f05001a;
+        public static final int titleStopTheAlarm=0x7f050019;
     }
     public static final class xml {
         public static final int admin=0x7f030000;

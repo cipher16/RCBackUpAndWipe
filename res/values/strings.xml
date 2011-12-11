@@ -7,8 +7,8 @@
 	<string name="registered">Registered with mail : </string>
 	<string name="noValidAccount">No valid account found</string>
 	
-	<string name="regOkTitle">Registration OK</string>
-	<string name="regOkSummary">Your registration is valid, you are now be able to get info from your phone from this url : </string>
+	<string name="regOkTitle">Registration Valid</string>
+	<string name="regOkSummary">You are now be able to get info from your phone from this url : \n</string>
 	<string name="regOkSummary2"> with the mail account : </string>
 	<string name="adminRights">Need some administrators right to make this software works</string>
 	<!-- Preferences -->
@@ -32,4 +32,10 @@
 	
 	<string name="prefTitleRegid">Registration ID</string>
 	<string name="prefSumRegid">This is the RegistrationID of your phone, this shouldn\'t be changed unless you know what you\'re doing</string>
+	
+	<string name="stoppedAlarm">The alarm has been stopped</string>
+	
+	<string name="notifAlarmRunning">Alarm is running !!!</string>
+	<string name="titleStopTheAlarm">Stop the alarm ?</string>
+	<string name="texteStopTheAlarm">Wanna stop the alarm ? Click here</string>
 </resources>

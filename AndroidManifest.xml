@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="eu.grigis.gaetan.rc"
-      android:versionCode="4" android:versionName="1.0.4">
+      android:versionCode="5" android:versionName="1.0.5">
     <uses-sdk android:minSdkVersion="8" />
 
 
@@ -24,6 +24,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+            	<action android:name="eu.grigis.gaetan.STOP_ALARM"/>
             </intent-filter>
         </activity>
 

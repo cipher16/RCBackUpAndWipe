@@ -37,7 +37,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	protected void onMessage(Context context, Intent intent) {
 		Log.i("C2DM", "Got the message : "+intent.getStringExtra("message"));
 		String action = intent.getStringExtra("message");
-		if(action.matches("(wipe|geoloc|status|ring|lock.+)"))//don't need to send auth again
+		if(action.matches("(wipe|geoloc|status|ring|lock.*)"))//don't need to send auth again
 			DataTransfer.launchAction(action,getBaseContext());
 	}
 

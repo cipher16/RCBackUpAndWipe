@@ -8,7 +8,7 @@
 	<string name="noValidAccount">Aucun compte valide trouvé</string>
 	
 	<string name="regOkTitle">Votre compte a été validé</string>
-	<string name="regOkSummary">Votre compte est valide, vous pouvez désormais récupérer les info sur le site  : </string>
+	<string name="regOkSummary">Vous pouvez désormais récupérer les info sur le site  : \n</string>
 	<string name="regOkSummary2"> avec l\'adresse mail : </string>
 	<string name="adminRights">L\'application a besoin de droits administrateurs pour fonctionner</string>
 	<!-- Preferences -->
@@ -32,4 +32,10 @@
 	
 	<string name="prefTitleRegid">Identifiant</string>
 	<string name="prefSumRegid">L\'identifiant du téléphone sur le site, à ne changer sous aucun prétexte</string>
+	
+	<string name="stoppedAlarm">L\'alarme a été arrêtée</string>
+	
+	<string name="notifAlarmRunning">Alarme en cours de fonctionnement !!!</string>
+	<string name="titleStopTheAlarm">Arrêter l\'alarme ?</string>
+	<string name="texteStopTheAlarm">Pour arrêter l\'alarme cliquez ici</string>
 </resources>

@@ -19,10 +19,18 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -36,6 +44,8 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import eu.grigis.gaetan.rc.R;
+import eu.grigis.gaetan.rc.RCMain;
 import eu.grigis.gaetan.rc.elements.AdminDevice;
 import eu.grigis.gaetan.rc.elements.GPSTask;
 
@@ -49,6 +59,7 @@ public class DataTransfer implements Serializable {
 	private String id;
 	private String type;
 	private enum action {STATUS,WIPE,GEOLOC,RING,AUTH,LOCK}
+	
 	public DataTransfer()
 	{
 		setMail("");
@@ -135,7 +146,7 @@ public class DataTransfer implements Serializable {
 		} catch (Exception e) {}
 	}
 	
-	public static void launchAction(String a,Context context)
+	public static void launchAction(String a,final Context context)
 	{
 		String pass="";
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
@@ -168,17 +179,27 @@ public class DataTransfer implements Serializable {
 					dpm.lockNow();
 			break;
 			case RING:
-				try{
-		        	Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-		        	MediaPlayer mMediaPlayer = new MediaPlayer();
-		        	mMediaPlayer.setDataSource(context, alert);
+				try{					
+					RCMain.getAlarmPlayer().reset();
+					Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+		        	RCMain.getAlarmPlayer().setDataSource(context, alert);
 		        	AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		        	audioManager.setStreamVolume(AudioManager.MODE_RINGTONE, audioManager.getStreamMaxVolume(AudioManager.MODE_RINGTONE), AudioManager.FLAG_PLAY_SOUND);
-					mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-					mMediaPlayer.prepare();
-					mMediaPlayer.start();
+		        	RCMain.getAlarmPlayer().setAudioStreamType(AudioManager.STREAM_ALARM);
+		        	RCMain.getAlarmPlayer().prepare();
+		        	RCMain.getAlarmPlayer().start();
+				}catch(Exception e){}	
+					NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			        Notification notification = new Notification(R.drawable.rcbu, context.getString(R.string.notifAlarmRunning), System.currentTimeMillis());
+			        Intent notificationIntent = new Intent(context, RCMain.class);
+			        notificationIntent.setAction("eu.grigis.gaetan.STOP_ALARM");
+			        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+			        notification.setLatestEventInfo(context, 
+			        		context.getString(R.string.titleStopTheAlarm), 
+			        		context.getString(R.string.texteStopTheAlarm), 
+			        		contentIntent);
+			        mNotificationManager.notify(1, notification);
 					Log.i("C2DM", "Ring is running !!!");
-				}catch(Exception e){}
 			break;
 			case STATUS:
 				TelephonyManager tm=(TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -194,6 +215,7 @@ public class DataTransfer implements Serializable {
 				data.put("Sim State", getNameOfEnum("simstate",tm.getSimState()));
 			break;
 			case GEOLOC:
+				//TODO enable GPS ondemand
 				LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 				Criteria criteria = new Criteria();
 				if(pref.getBoolean("UseGPS", false))
